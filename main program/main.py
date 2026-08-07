@@ -16,6 +16,8 @@ class root(tk.Tk):
 
         self.screen_width = int(self.winfo_screenwidth())
         self.screen_height = int(self.winfo_screenheight())
+        print(self.screen_width)
+        print(self.screen_height)
         x = (self.screen_width - self.screen_width) // 2
         y = (self.screen_height - self.screen_height) // 2
 
