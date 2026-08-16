@@ -1,7 +1,6 @@
 import tkinter as tk
 from tkinter import *
 from PIL import Image, ImageTk
-from tkinter import ttk
 
 from title import titlescreen
 from login import loginscreen
@@ -34,7 +33,7 @@ class root(tk.Tk):
             self.currentscreen[loadedframe] = frame
             frame.place(relwidth=1, relheight=1)
         
-        self.show_frame(game)
+        self.show_frame(loginscreen)
         
     def show_frame(self, currentframe):
         frame = self.currentscreen[currentframe]
@@ -42,4 +41,3 @@ class root(tk.Tk):
 
 app = root()
 app.mainloop()
-

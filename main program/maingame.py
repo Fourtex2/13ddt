@@ -1,12 +1,7 @@
 import tkinter as tk
-from tkinter import *
 from PIL import Image, ImageTk
 from tkinter import ttk
 import random
-import sympy as sp
-import re
-import questions
-import time
 import achieved_multiple_choice
 
 class game(tk.Frame):
@@ -25,7 +20,7 @@ class reactor(tk.Canvas):
                 root
             )
         )
-        self.background = Image.open("placeholder_background.png")
+        self.background = Image.open("13ddt_assets_dump_ddt_menu_background_autosave copy.png")
         self.background = self.background.resize(
             (root.screen_width, root.screen_height)
         )
@@ -38,17 +33,17 @@ class reactor(tk.Canvas):
             anchor="center"
         )
 
-        self.progressbar = Image.open("progress_bar_placeholder.png")
-        self.progressbar = self.progressbar.resize(
+        self.progressbar_frame = Image.open("progress_bar_placeholder.png")
+        self.progressbar_frame = self.progressbar_frame.resize(
             (
                 root.screen_width,
                 int(root.screen_height * 0.7)
             ),
             Image.Resampling.LANCZOS
         )
-        self.progressbar2 = ImageTk.PhotoImage(self.progressbar)
+        self.progressbar2 = ImageTk.PhotoImage(self.progressbar_frame)
 
-        self.progressbar_item1 = self.create_image(
+        self.progressbar_frame_window = self.create_image(
             int(root.screen_width // 2),
             int(root.screen_height * 0.3),
             image=self.progressbar2,
@@ -69,14 +64,16 @@ class reactor(tk.Canvas):
             self.progressbar_bar
         )
 
-        self.progressbar_bar_item2 = self.create_image(
-            int(root.screen_width * -0.45 * self.achieved_questions_file.energy_amount),
+        self.progressbar_bar_window2 = self.create_image(
+            int(root.screen_width * -0.2),
             int(root.screen_height * -0.03),
             image=self.progressbar_bar2,
             anchor='center'
         )
+        
+        self.achieved_questions_file.bar_mover()
 
-        self.tag_raise(self.progressbar_item1)
+        self.tag_raise(self.progressbar_frame_window)
 
         achieved_button_img = Image.open(
             "button_achieveed_questions_placeholder.png"
@@ -85,47 +82,24 @@ class reactor(tk.Canvas):
             (200, 120),
             Image.Resampling.LANCZOS
         )
-
         self.button_test_image = ImageTk.PhotoImage(
             achieved_button_img
         )
 
-        self.multiple_choice_button = tk.Label(
-            self,
-            image=self.button_test_image,
-            borderwidth=0,
-            highlightthickness=0
-        )
-
-        self.create_window(
+        self.multiple_choice_button_window = self.create_image(
             root.screen_width * 0.2,
             root.screen_height * 0.7,
-            window=self.multiple_choice_button
+            image=self.button_test_image,
+            anchor = 'center',
+            state = "normal"
         )
-
-
 
         def button_clicked(event):
             print("ibhjn")
             self.achieved_questions_file.create_question()
 
-        self.multiple_choice_button.bind(
+        self.tag_bind(
+            self.multiple_choice_button_window,
             "<Button-1>",
             button_clicked
-        )
-        
-        self.tag_raise(
-        self.achieved_questions_file.correct_answer_window
-        )
-
-        self.tag_raise(
-            self.achieved_questions_file.incorrect_answer_window
-        )
-
-        self.tag_raise(
-            self.achieved_questions_file.time_limit_window
-        )
-
-        self.tag_raise(
-            self.achieved_questions_file.frame_window
         )

@@ -2,6 +2,7 @@ import tkinter as tk
 from PIL import Image, ImageTk
 import random
 import questions
+import tkinter.font as tkFont
 
 def generate_question():
     achieved_multiple_choice = [
@@ -52,8 +53,22 @@ class AchievedQuestions:
             label.config(bg="red")
         self.answer_labels[self.correct_answer].config(bg="green")
 
+    def bar_mover(self):
+        start_x = int(self.root.screen_width * -0.45)
+        start_y = int(self.root.screen_height * -0.03)
+
+        movement = int(
+            self.root.screen_width * 0.01 * self.energy_amount
+        )
+
+        self.canvas.coords(
+            self.canvas.progressbar_bar_window2,
+            start_x + movement,
+            start_y
+        )
 
     def answer_checker(self, clicked_label):
+
         if self.timeout_status is not None:
             self.canvas.after_cancel(self.timeout_status)
             self.timeout_status = None
@@ -62,10 +77,7 @@ class AchievedQuestions:
             self.canvas.after_cancel(self.answer_image_status)
             self.answer_image_status = None
 
-        self.canvas.itemconfigure(
-            self.frame_window,
-            state="hidden"
-        )
+        self.hide_question_labels()
 
         if clicked_label == self.answer_labels[self.correct_answer]:
 
@@ -85,15 +97,27 @@ class AchievedQuestions:
             self.canvas.tag_raise(
                 self.correct_answer_window
             )
-
-
+            self.canvas.tag_raise(
+                self.canvas.multiple_choice_button_window
+            )
             self.answer_image_status = self.canvas.after(
                 1000,
                 self.hide_answer_image
             )
+            self.canvas.tag_lower(
+                self.question_background_window
+            )
+            self.canvas.itemconfigure(
+                self.question_background_window,
+                state="hidden"
+            )
+
+            self.bar_mover()
+            self.correct_answers_answered += 1
 
         else:
-            self.energy_amount -= 4
+
+            self.energy_amount -= 4989898398239823983298
             print(self.energy_amount)
 
             self.canvas.itemconfigure(
@@ -109,12 +133,26 @@ class AchievedQuestions:
             self.canvas.tag_raise(
                 self.incorrect_answer_window
             )
-
-
+            self.canvas.tag_raise(
+                self.canvas.multiple_choice_button_window
+            )
             self.answer_image_status = self.canvas.after(
                 1000,
                 self.hide_answer_image
             )
+            self.canvas.tag_lower(
+                self.question_background_window
+            )
+            self.canvas.itemconfigure(
+                self.question_background_window,
+                state="hidden"
+            )
+
+            self.bar_mover()
+            if self.energy_amount <= 0:
+                self.game_over()
+            self.incorrect_answers_answered += 1
+
 
     def hide_answer_image(self):
 
@@ -129,14 +167,99 @@ class AchievedQuestions:
         )
 
         self.answer_image_status = None
+    def hide_question_labels(self):
+        self.question_label.place_forget()
+        self.answer_1_label.place_forget()
+        self.answer_2_label.place_forget()
+        self.answer_3_label.place_forget()
+        self.answer_4_label.place_forget()
+        
+    def show_questions(self):
+        self.canvas.itemconfigure(
+            self.question_background_window,
+            state="normal"
+        )
+        self.canvas.tag_raise(
+            self.question_background_window
+        )
+        self.canvas.tag_lower(
+            self.canvas.multiple_choice_button_window
+        )
+        self.question_label.place(
+            relx=.5,
+            rely=.35,
+            relheight=.1,
+            relwidth=.7,
+            anchor="center"
+        )
+        self.answer_1_label.place(
+            relx=.3,
+            rely=.5,
+            relheight=.1,
+            relwidth=.3,
+            anchor='center')
+        self.answer_2_label.place(
+            relx=.7,
+            rely=.5,
+            relheight=.1,
+            relwidth=.3,
+            anchor='center')
+        self.answer_3_label.place(
+            relx=.3,
+            rely=.7,
+            relheight=.1,
+            relwidth=.3,
+            anchor='center')
+        self.answer_4_label.place(
+            relx=.7,
+            rely=.7,
+            relheight=.1,
+            relwidth=.3,
+            anchor='center')
+        
+    def game_over(self):
+        self.canvas.itemconfigure(
+            self.question_background_window,
+            state = "normal"
+        )
+        self.canvas.itemconfigure(
+            self.canvas.multiple_choice_button_window,
+            state = "hidden"
+        )
+        self.canvas.tag_raise(
+            self.question_background_window
+        )        
+        self.canvas.lower(
+            self.canvas.multiple_choice_button_window
+        )
+
+        self.canvas.itemconfigure(
+            self.game_over_title2,
+            state = "normal"
+        )
+        self.total_score.place(
+            relx=.5,
+            rely=.5,
+            relheight=.2,
+            relwidth=.7,
+            anchor="center"
+        )
+        print("GAME OVER")
+
+        
 
     def __init__(self, canvas, root):
-
+        self.correct_answers_answered = 0
+        self.incorrect_answers_answered = 0
         self.canvas = canvas
         self.root = root
-        self.energy_amount = 0
+        self.energy_amount = 10
         self.answer_image_status = None
         self.timeout_status = None
+#------------------------------------------------------------------------------------------------
+#------------------------------------------------------------------------------------------------
+#------------------------------------------------------------------------------------------------
+#------------------------------------------------------------------------------------------------
 
         self.achieved_multiple_choice = [
             questions.complex_modulus_achieved,
@@ -149,57 +272,106 @@ class AchievedQuestions:
             questions.differentiation_product_achieved,
             questions.differentiation_quotient_achieved
         ]
+#------------------------------------------------------------------------------------------------
+#------------------------------------------------------------------------------------------------
+#------------------------------------------------------------------------------------------------
+#------------------------------------------------------------------------------------------------
+
+        self.game_over_title = Image.open(
+            "testimg.png"
+        )
+        self.game_over_title = self.game_over_title.resize(
+            (
+            int(root.screen_width * 0.8),
+            int(root.screen_height * 0.7)),
+            Image.Resampling.NEAREST
+        )
+        self.game_over_title2 = ImageTk.PhotoImage(
+            self.game_over_title
+        ) 
+        self.game_over_title_window = self.canvas.create_image(
+            root.screen_width // 2,
+            root.screen_height // 2,
+            image=self.game_over_title2,
+            anchor="center",
+            state="hidden"
+        )
 
 
-        self.multiple_choice_questions_frame = tk.Frame(self.canvas, bg="grey")        
 
 
-        self.question_label = tk.Label(self.multiple_choice_questions_frame,bg="blue")
-        self.question_label.place(relx=.5,
-                            rely=.2,
-                            relheight=.1,
-                            relwidth=.7,
-                            anchor='center')
+#------------------------------------------------------------------------------------------------
+#------------------------------------------------------------------------------------------------
+#------------------------------------------------------------------------------------------------
+#------------------------------------------------------------------------------------------------
+#------------------------------------------------------------------------------------------------
 
-        self.answer_1_label = tk.Label(self.multiple_choice_questions_frame,bg="green")
-        self.answer_1_label.place(relx=.3,
-                            rely=.4,
-                            relheight=.1,
-                            relwidth=.3,
-                            anchor='center')
+        self.question_background = Image.open(
+            "ddt_questions_plate.001.png"
+        )
+        self.question_background = self.question_background.resize(
+            (
+            int(root.screen_width * 0.8),
+            int(root.screen_height * 0.7)),
+            Image.Resampling.NEAREST
+        )
+        self.question_background2 = ImageTk.PhotoImage(
+            self.question_background
+        )
+        self.question_background_window = self.canvas.create_image(
+            root.screen_width // 2,
+            root.screen_height // 2,
+            image=self.question_background2,
+            anchor="center",
+            state="hidden"
+        )
+            
+        # self.multiple_choice_questions_background = tk.Frame(self.canvas,bg="grey")
         
-        self.answer_2_label = tk.Label(self.multiple_choice_questions_frame,bg="green")
-        self.answer_2_label.place(relx=.6,
-                            rely=.4,
-                            relheight=.1,
-                            relwidth=.3,
-                            anchor='center')
-        self.answer_3_label = tk.Label(self.multiple_choice_questions_frame,bg="green")
-        self.answer_3_label.place(relx=.3,
-                            rely=.8,
-                            relheight=.1,
-                            relwidth=.3,
-                            anchor='center')
-        self.answer_4_label = tk.Label(self.multiple_choice_questions_frame,bg="green")
-        self.answer_4_label.place(relx=.6,
-                            rely=.8,
-                            relheight=.1,
-                            relwidth=.3,
-                            anchor='center')
+        # self.question_background_window = self.canvas.create_window(
+        #     root.screen_width // 2,
+        #     root.screen_height // 2,
+        #     window=self.multiple_choice_questions_background,
+        #     width=int(root.screen_width * 0.8),
+        #     height=int(root.screen_height * 0.7),
+        #     anchor="center",
+        #     state="hidden"
+        # )
 
+        self.Courier = tkFont.Font(family="Courier")
+
+
+        self.question_label = tk.Label(self.canvas,
+                                       bg="blue",
+                                       font=self.Courier)
+
+        self.answer_1_label = tk.Label(self.canvas,
+                                       bg="green",
+                                       font=self.Courier)
+        self.answer_2_label = tk.Label(self.canvas,
+                                       bg="green",
+                                       font=self.Courier)
+        self.answer_3_label = tk.Label(self.canvas,
+                                       bg="green",
+                                       font=self.Courier)
+        self.answer_4_label = tk.Label(self.canvas,
+                                       bg="green",
+                                       font=self.Courier)
+        
+        self.total_score = tk.Label(self.canvas,
+                        bg="red",
+                        font=self.Courier,
+                        text=self.correct_answers_answered)
         self.correct_answer_img = Image.open(
-            "correct_answer_placeholder.jpg"
+            "ddt_correct.png"
         )
-
         self.correct_answer_img = self.correct_answer_img.resize(
-            (500, 500),
-            Image.Resampling.LANCZOS
+            (root.screen_width, root.screen_height),
+            Image.Resampling.NEAREST
         )
-
         self.correct_answer_img2 = ImageTk.PhotoImage(
             self.correct_answer_img
         )
-
         self.correct_answer_window = self.canvas.create_image(
             root.screen_width // 2,
             root.screen_height // 2,
@@ -223,18 +395,15 @@ class AchievedQuestions:
             )
             
         self.incorrect_answer_img = Image.open(
-            "incorrect_answer_placeholder.jpg"
+            "ddt_incorrect.png"
         )
-
         self.incorrect_answer_img = self.incorrect_answer_img.resize(
-            (500, 500),
-            Image.Resampling.LANCZOS
+            (root.screen_width, root.screen_height),
+            Image.Resampling.NEAREST
         )
-
         self.incorrect_answer_img2 = ImageTk.PhotoImage(
             self.incorrect_answer_img
         )
-
         self.incorrect_answer_window = self.canvas.create_image(
             root.screen_width // 2,
             root.screen_height // 2,
@@ -243,51 +412,42 @@ class AchievedQuestions:
             state="hidden"
             )
 
-        self.time_limit_img = Image.open("yttlcover.jpg")
-        self.time_limit_img = self.time_limit_img.resize((500,500,),Image.Resampling.LANCZOS)
-        self.time_limit_img2 = ImageTk.PhotoImage(self.time_limit_img)
-        self.time_limit_label = tk.Label(
-            self.canvas,
-            image=self.time_limit_img2,
-            borderwidth=0
+        self.time_limit_img = Image.open(
+            "yttlcover.jpg"
         )
-        self.time_limit_window = self.canvas.create_window(
+        self.time_limit_img = self.time_limit_img.resize(
+            (500, 500),
+            Image.Resampling.NEAREST
+        )
+        self.time_limit_img2 = ImageTk.PhotoImage(self.time_limit_img)
+        self.time_limit_window = self.canvas.create_image(
             root.screen_width // 2,
             root.screen_height // 2,
-            window=self.time_limit_label,
+            image=self.time_limit_img2,
+            anchor="center",
             state="hidden"
-        )
+            )
 
 
         
-        self.frame_window = self.canvas.create_window(
-            root.screen_width // 2,
-            root.screen_height // 2,
-            window=self.multiple_choice_questions_frame,
-            width=int(root.screen_width * 0.8),
-            height=int(root.screen_height * 0.7),
-            anchor="center",
-            state="hidden"
-        )
-
     def time_limit(self):
 
         self.timeout_status = None
+        self.energy_amount -= 3
 
-        # Cancel result image timer if one exists
         if self.answer_image_status is not None:
             self.canvas.after_cancel(
                 self.answer_image_status
             )
             self.answer_image_status = None
 
-        # Hide question
         self.canvas.itemconfigure(
-            self.frame_window,
+            self.question_background_window,
             state="hidden"
         )
 
-        # Hide result images
+        self.hide_question_labels()
+
         self.canvas.itemconfigure(
             self.correct_answer_window,
             state="hidden"
@@ -298,7 +458,6 @@ class AchievedQuestions:
             state="hidden"
         )
 
-        # Show timeout
         self.canvas.itemconfigure(
             self.time_limit_window,
             state="normal"
@@ -308,7 +467,13 @@ class AchievedQuestions:
             self.time_limit_window
         )
 
-        self.time_limit_label.lift()
+        self.canvas.tag_lower(
+            self.question_background_window
+        )
+        self.canvas.itemconfigure(
+            self.question_background_window,
+            state="hidden"
+        )
 
         self.canvas.after(
             1000,
@@ -317,6 +482,7 @@ class AchievedQuestions:
                 state="hidden"
             )
         )
+        
     def create_question(self):
 
         if self.answer_image_status is not None:
@@ -337,16 +503,7 @@ class AchievedQuestions:
 
         self.question_generator()
 
-        self.canvas.itemconfigure(
-            self.frame_window,
-            state="normal"
-        )
-
-        self.multiple_choice_questions_frame.update_idletasks()
-
-        self.canvas.tag_raise(
-            self.frame_window
-        )
+        self.show_questions()
 
         if self.timeout_status is not None:
             self.canvas.after_cancel(
