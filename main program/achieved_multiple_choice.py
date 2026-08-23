@@ -4,17 +4,6 @@ import random
 import questions
 import tkinter.font as tkFont
 
-def generate_question():
-    achieved_multiple_choice = [
-    questions.complex_modulus_achieved,
-    questions.complex_argument_achieved,
-    questions.differentiation_basic_achieved,
-    ]
-
-    question, answer = random.choice(achieved_multiple_choice)()
-
-    return question, answer
-
 
 class AchievedQuestions:
     def question_generator(self):
@@ -54,18 +43,25 @@ class AchievedQuestions:
         self.answer_labels[self.correct_answer].config(bg="green")
 
     def bar_mover(self):
-        start_x = int(self.root.screen_width * -0.45)
-        start_y = int(self.root.screen_height * -0.03)
+        self.start_x = int(self.root.screen_width * -0.45)
+        self.start_y = int(self.root.screen_height * -0.03)
 
-        movement = int(
-            self.root.screen_width * 0.01 * self.energy_amount
+        if self.energy_amount <= 80:
+            self.movement = int(
+                self.root.screen_width * 0.01 * self.energy_amount
+            )
+            self.canvas.coords(
+                self.canvas.progressbar_bar_window2,
+                self.start_x + self.movement,
+                self.start_y
+            )
+        else:
+            self.canvas.coords(
+                self.canvas.progressbar_bar_window2,
+                self.start_x,
+                self.start_y
         )
-
-        self.canvas.coords(
-            self.canvas.progressbar_bar_window2,
-            start_x + movement,
-            start_y
-        )
+            self.energy_amount = 10
 
     def answer_checker(self, clicked_label):
 
@@ -114,6 +110,10 @@ class AchievedQuestions:
 
             self.bar_mover()
             self.correct_answers_answered += 1
+            self.total_energy_amount += 6
+            self.correct_questions_answered.config(text=self.correct_answers_answered)
+            self.total_energy_gained.config(text=self.total_energy_amount)
+
 
         else:
 
@@ -152,6 +152,8 @@ class AchievedQuestions:
             if self.energy_amount <= 0:
                 self.game_over()
             self.incorrect_answers_answered += 1
+            print(self.energy_amount)
+
 
 
     def hide_answer_image(self):
@@ -237,13 +239,37 @@ class AchievedQuestions:
             self.game_over_title2,
             state = "normal"
         )
-        self.total_score.place(
+        self.correct_questions_answered.place(
             relx=.5,
-            rely=.5,
-            relheight=.2,
-            relwidth=.7,
+            rely=.4,
+            relheight=.1,
+            relwidth=.3,
             anchor="center"
         )
+        self.correct_questions_answered_label.place(
+            relx=.5,
+            rely=.3,
+            relheight=.1,
+            relwidth=.4,
+            anchor="center"
+        )
+        self.total_energy_gained_label.place(
+            relx=.5,
+            rely=.6,
+            relheight=.1,
+            relwidth=.4,
+            anchor="center"
+        )
+        self.total_energy_gained.place(
+            relx=.5,
+            rely=.7,
+            relheight=.1,
+            relwidth=.3,
+            anchor="center"
+        )
+        self.canvas.itemconfigure(
+            self.close_game_window,
+            state="normal")
         print("GAME OVER")
 
         
@@ -256,6 +282,7 @@ class AchievedQuestions:
         self.energy_amount = 10
         self.answer_image_status = None
         self.timeout_status = None
+        self.total_energy_amount = 0
 #------------------------------------------------------------------------------------------------
 #------------------------------------------------------------------------------------------------
 #------------------------------------------------------------------------------------------------
@@ -339,6 +366,8 @@ class AchievedQuestions:
         # )
 
         self.Courier = tkFont.Font(family="Courier")
+        self.Big_Courier = tkFont.Font(family="Courier",size=20)
+
 
 
         self.question_label = tk.Label(self.canvas,
@@ -357,11 +386,28 @@ class AchievedQuestions:
         self.answer_4_label = tk.Label(self.canvas,
                                        bg="green",
                                        font=self.Courier)
+
         
-        self.total_score = tk.Label(self.canvas,
-                        bg="red",
-                        font=self.Courier,
+        self.correct_questions_answered_label = tk.Label(self.canvas,
+                        bg="dark grey",
+                        font=self.Big_Courier,
+                        text="Correct questions answered")
+        self.correct_questions_answered = tk.Label(self.canvas,
+                        bg="dark grey",
+                        font=self.Big_Courier,
                         text=self.correct_answers_answered)
+        
+        self.total_energy_gained_label = tk.Label(self.canvas,
+                        bg="dark grey",
+                        font=self.Big_Courier,
+                        text="Total energy gained")
+        self.total_energy_gained = tk.Label(self.canvas,
+                        bg="dark grey",
+                        font=self.Big_Courier,
+                        text=self.total_energy_amount)
+        
+
+        
         self.correct_answer_img = Image.open(
             "ddt_correct.png"
         )
@@ -411,6 +457,14 @@ class AchievedQuestions:
             anchor="center",
             state="hidden"
             )
+        self.close_game = tk.Button(self.canvas,bg="blue", text="CLOSE",command=lambda:root.destroy())
+        self.close_game_window = self.canvas.create_window(
+            root.screen_width // 2,
+            int(root.screen_height * 0.8),
+            window=self.close_game,
+            anchor="center",
+            state="hidden"
+        )
 
         self.time_limit_img = Image.open(
             "yttlcover.jpg"
@@ -482,6 +536,11 @@ class AchievedQuestions:
                 state="hidden"
             )
         )
+        self.bar_mover()
+        if self.energy_amount <= 0:
+            self.game_over()
+        self.incorrect_answers_answered += 1
+        print(self.energy_amount)
         
     def create_question(self):
 

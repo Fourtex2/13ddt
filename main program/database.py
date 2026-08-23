@@ -16,28 +16,55 @@ def create_tables():
             CREATE TABLE IF NOT EXISTS users (
                 id          INTEGER PRIMARY KEY AUTOINCREMENT,
                 username    TEXT    NOT NULL UNIQUE,
-                password    TEXT    NOT NULL ,
-                stage       REAL    NOT NULL DEFAULT 0
+                password    TEXT    NOT NULL
             )
         """)
 
         cursor.execute("SELECT COUNT(*) FROM users")
         if cursor.fetchone()[0] == 0:
-            cursor.execute("INSERT INTO users (username, password, stage) VALUES (user_a, password_a, 0)")
-            cursor.execute("INSERT INTO users (username, password, stage) VALUES (user_b, password_b, 0)")
-            cursor.execute("INSERT INTO users (username, password, stage) VALUES (user_c, password_c, 0)")
-        conn.commit()
+            cursor.execute(
+                "INSERT INTO users (username, password) VALUES (?, ?)",
+                ("user_a", "password_a")
+            )
 
+            cursor.execute(
+                "INSERT INTO users (username, password) VALUES (?, ?)",
+                ("user_b", "password_b")
+            )
 
-def load_user() -> list[dict]:
+            cursor.execute(
+                "INSERT INTO users (username, password) VALUES (?, ?)",
+                ("user_c", "password_c")
+            )
+            conn.commit()
+            
+def check_login(username, password):
     with connection() as conn:
-        cur = conn.cursor()
-        cur.execute("SELECT username, password, stage FROM users ORDER BY id")
-        return [
-                    {
-                        "username": row[0],
-                        "password": row[1],
-                        "stage":row[2]
-                    }
-                for row in cur.fetchall()
-            ]
+        cursor = conn.cursor()
+
+        cursor.execute(
+            "SELECT username FROM users WHERE username = ? AND password = ?",
+            (username, password)
+        )
+
+        user = cursor.fetchone()
+
+        if user:
+            return True
+
+        return False
+
+def add_user(username, password):
+    with connection() as conn:
+        cursor = conn.cursor()
+
+        try:
+            cursor.execute(
+                "INSERT INTO users (username, password) VALUES (?, ?)",
+                (username, password)
+            )
+            conn.commit()
+            return True
+
+        except sqlite3.IntegrityError:
+            return False

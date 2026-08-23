@@ -3,6 +3,7 @@ from PIL import Image, ImageTk
 from tkinter import ttk
 import random
 import achieved_multiple_choice
+import login
 
 class game(tk.Frame):
     def __init__(self, screen, root):
@@ -14,12 +15,15 @@ class game(tk.Frame):
 class reactor(tk.Canvas):
     def __init__(self, screen, root):
         super().__init__(screen)
+
         self.achieved_questions_file = (
             achieved_multiple_choice.AchievedQuestions(
                 self,
                 root
             )
         )
+
+        
         self.background = Image.open("13ddt_assets_dump_ddt_menu_background_autosave copy.png")
         self.background = self.background.resize(
             (root.screen_width, root.screen_height)

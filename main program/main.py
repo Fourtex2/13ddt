@@ -2,7 +2,6 @@ import tkinter as tk
 from tkinter import *
 from PIL import Image, ImageTk
 
-from title import titlescreen
 from login import loginscreen
 from maingame import game
 
@@ -28,7 +27,7 @@ class root(tk.Tk):
 
         screen.place(relwidth=1, relheight  =1)
 
-        for loadedframe in (loginscreen,titlescreen,game): #loaded frame is the current screen being shown
+        for loadedframe in (loginscreen,game): #loaded frame is the current screen being shown
             frame = loadedframe(screen,self) #frame is the loaded frame, and makes a object
             self.currentscreen[loadedframe] = frame
             frame.place(relwidth=1, relheight=1)
