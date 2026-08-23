@@ -80,10 +80,10 @@ class reactor(tk.Canvas):
         self.tag_raise(self.progressbar_frame_window)
 
         achieved_button_img = Image.open(
-            "button_achieveed_questions_placeholder.png"
+            "new_question.png"
         )
         achieved_button_img = achieved_button_img.resize(
-            (200, 120),
+            (500, 350),
             Image.Resampling.LANCZOS
         )
         self.button_test_image = ImageTk.PhotoImage(
@@ -91,15 +91,14 @@ class reactor(tk.Canvas):
         )
 
         self.multiple_choice_button_window = self.create_image(
-            root.screen_width * 0.2,
-            root.screen_height * 0.7,
+            root.screen_width * 0.5,
+            root.screen_height * 0.6,
             image=self.button_test_image,
             anchor = 'center',
             state = "normal"
         )
 
         def button_clicked(event):
-            print("ibhjn")
             self.achieved_questions_file.create_question()
 
         self.tag_bind(

@@ -6,7 +6,7 @@ import tkinter.font as tkFont
 
 
 class AchievedQuestions:
-    def question_generator(self):
+    def question_generator(self): #generates a question and an answer, as well as three false answers
 
         question, answer = random.choice(
             self.achieved_multiple_choice
@@ -38,11 +38,11 @@ class AchievedQuestions:
 
         self.correct_answer = self.answer_list.index(answer)
         
-        for label in self.answer_labels:
-            label.config(bg="red")
-        self.answer_labels[self.correct_answer].config(bg="green")
+        # for label in self.answer_labels:
+        #     label.config(bg="red")
+        # self.answer_labels[self.correct_answer].config(bg="green")
 
-    def bar_mover(self):
+    def bar_mover(self): #moves the bar
         self.start_x = int(self.root.screen_width * -0.45)
         self.start_y = int(self.root.screen_height * -0.03)
 
@@ -63,7 +63,7 @@ class AchievedQuestions:
         )
             self.energy_amount = 10
 
-    def answer_checker(self, clicked_label):
+    def answer_checker(self, clicked_label): #checks if the selected answer is correct
 
         if self.timeout_status is not None:
             self.canvas.after_cancel(self.timeout_status)
@@ -117,7 +117,7 @@ class AchievedQuestions:
 
         else:
 
-            self.energy_amount -= 4989898398239823983298
+            self.energy_amount -= 3
             print(self.energy_amount)
 
             self.canvas.itemconfigure(
@@ -235,10 +235,6 @@ class AchievedQuestions:
             self.canvas.multiple_choice_button_window
         )
 
-        self.canvas.itemconfigure(
-            self.game_over_title2,
-            state = "normal"
-        )
         self.correct_questions_answered.place(
             relx=.5,
             rely=.4,
@@ -299,33 +295,6 @@ class AchievedQuestions:
             questions.differentiation_product_achieved,
             questions.differentiation_quotient_achieved
         ]
-#------------------------------------------------------------------------------------------------
-#------------------------------------------------------------------------------------------------
-#------------------------------------------------------------------------------------------------
-#------------------------------------------------------------------------------------------------
-
-        self.game_over_title = Image.open(
-            "testimg.png"
-        )
-        self.game_over_title = self.game_over_title.resize(
-            (
-            int(root.screen_width * 0.8),
-            int(root.screen_height * 0.7)),
-            Image.Resampling.NEAREST
-        )
-        self.game_over_title2 = ImageTk.PhotoImage(
-            self.game_over_title
-        ) 
-        self.game_over_title_window = self.canvas.create_image(
-            root.screen_width // 2,
-            root.screen_height // 2,
-            image=self.game_over_title2,
-            anchor="center",
-            state="hidden"
-        )
-
-
-
 
 #------------------------------------------------------------------------------------------------
 #------------------------------------------------------------------------------------------------
@@ -483,7 +452,20 @@ class AchievedQuestions:
             )
 
 
-        
+    def show_button(self):
+        self.canvas.itemconfigure(
+            self.time_limit_window,
+            state="hidden"
+        )
+
+        self.canvas.itemconfigure(
+            self.canvas.multiple_choice_button_window,
+            state="normal"
+        )
+
+        self.canvas.tag_raise(
+            self.canvas.multiple_choice_button_window
+        )
     def time_limit(self):
 
         self.timeout_status = None
@@ -517,25 +499,24 @@ class AchievedQuestions:
             state="normal"
         )
 
-        self.canvas.tag_raise(
-            self.time_limit_window
-        )
+        # self.canvas.tag_raise(
+        #     self.canvas.multiple_choice_button_window
+        # )
 
-        self.canvas.tag_lower(
-            self.question_background_window
-        )
         self.canvas.itemconfigure(
             self.question_background_window,
             state="hidden"
         )
-
+        self.canvas.tag_raise(
+            self.time_limit_window
+        )
         self.canvas.after(
             1000,
-            lambda: self.canvas.itemconfigure(
-                self.time_limit_window,
-                state="hidden"
-            )
+            lambda: self.show_button()
         )
+        # self.canvas.tag_raise(
+        #     self.canvas.multiple_choice_button_window
+        # )
         self.bar_mover()
         if self.energy_amount <= 0:
             self.game_over()
@@ -571,6 +552,6 @@ class AchievedQuestions:
             self.timeout_status = None
 
         self.timeout_status = self.canvas.after(
-            2000,
+            15000,
             self.time_limit
         )

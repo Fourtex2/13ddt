@@ -1,7 +1,9 @@
 import sqlite3
 import os
 
-db_location = os.path.join(os.path.dirname(__file__), "data", "database.db") #defines where the data file and database are
+db_location = os.path.join(os.path.dirname(__file__),
+                            "data",
+                            "database.db") #defines where the data file and database are
 
 
 def connection(): #makes the database
@@ -53,7 +55,21 @@ def check_login(username, password):
             return True
 
         return False
+def check_username(username):
+    with connection() as conn:
+        cursor = conn.cursor()
 
+        cursor.execute(
+            "SELECT username FROM users WHERE username = ?",
+            (username,)
+        )
+
+        user = cursor.fetchone()
+
+        if user:
+            return True
+
+        return False
 def add_user(username, password):
     with connection() as conn:
         cursor = conn.cursor()
